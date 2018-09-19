@@ -4,28 +4,17 @@ import org.scalatest._
 
 class Exercise3_2Spec extends FlatSpec {
 
-  "tail of List(1, 2, 3, 4)" should "return List(2, 3, 4)" in {
-    val integerList = List(1, 2, 3, 4)
-    assert(List.tail(integerList) === List(2, 3, 4))
-  }
+  val testCases = Seq(
+    (List(1, 2, 3, 4), List(2, 3, 4)),
+    (List("hello", "hi", "goodbye"), List("hi", "goodbye")),
+    (List(2.1, 1.3), List(1.3)),
+    (List(1), Nil),
+    (Nil, Nil)
+  )
 
-  "tail of List(hello, hi, goodbye)" should "return List(hi, goodbye)" in {
-    val stringList = List("hello", "hi", "goodbye")
-    assert(List.tail(stringList) === List("hi", "goodbye"))
+  for ((input, output) <- testCases) {
+    s"tail of $input" should s"return $output" in {
+      assert(List.tail(input) === output)
+    }
   }
-
-  "tail of List(2.1, 1.3)" should "return List(1.3)" in {
-    val doubleList = List(2.1, 1.3)
-    assert(List.tail(doubleList) === List(1.3))
-  }
-
-  "tail of list with one element" should "return Nil" in {
-    val list = List(1)
-    assert(List.tail(list) === Nil)
-  }
-
-  "tail of empty list" should "return Nil" in {
-    assert(List.tail(Nil) === Nil)
-  }
-
 }
