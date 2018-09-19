@@ -52,7 +52,7 @@ object List { // `List` companion object. Contains functions for creating and wo
 
 
   def tail[A](l: List[A]): List[A] = l match {
-    case Nil => Nil
+    case Nil => sys.error("tail of empty list")
     case Cons(_, tail) => tail
   }
 
@@ -61,7 +61,10 @@ object List { // `List` companion object. Contains functions for creating and wo
     case list => Cons(h, list)
   }
 
-  def drop[A](l: List[A], n: Int): List[A] = ???
+  def drop[A](l: List[A], n: Int): List[A] = n match {
+    case num if num <= 0 => l
+    case _ => drop(tail(l), n - 1)
+  }
 
   def dropWhile[A](l: List[A], f: A => Boolean): List[A] = ???
 
