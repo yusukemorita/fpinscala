@@ -1,7 +1,6 @@
-package fpinscala.gettingstarted
+package fpinscala.datastructures
 
 import org.scalatest._
-import fpinscala.datastructures._
 
 class Exercise3_2Spec extends FlatSpec {
 
