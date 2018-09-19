@@ -27,6 +27,7 @@ object List { // `List` companion object. Contains functions for creating and wo
     case Cons(x, Cons(2, Cons(4, _))) => x
     case Nil => 42
     case Cons(x, Cons(y, Cons(3, Cons(4, _)))) => x + y
+    // matches here, results in x + y = 1 + 2 = 3
     case Cons(h, t) => h + sum(t)
     case _ => 101
   }
@@ -50,7 +51,10 @@ object List { // `List` companion object. Contains functions for creating and wo
     foldRight(ns, 1.0)(_ * _) // `_ * _` is more concise notation for `(x,y) => x * y`; see sidebar
 
 
-  def tail[A](l: List[A]): List[A] = ???
+  def tail[A](l: List[A]): List[A] = l match {
+    case Nil => Nil
+    case Cons(_, tail) => tail
+  }
 
   def setHead[A](l: List[A], h: A): List[A] = ???
 
