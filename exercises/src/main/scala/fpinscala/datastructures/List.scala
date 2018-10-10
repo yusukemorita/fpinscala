@@ -38,12 +38,6 @@ object List { // `List` companion object. Contains functions for creating and wo
       case Cons(h,t) => Cons(h, append(t, a2))
     }
 
-  def foldRight[A,B](as: List[A], z: B)(f: (A, B) => B): B = // Utility functions
-    as match {
-      case Nil => z
-      case Cons(x, xs) => f(x, foldRight(xs, z)(f))
-    }
-
   def sum2(ns: List[Int]) =
     foldRight(ns, 0)((x,y) => x + y)
 
@@ -79,11 +73,33 @@ object List { // `List` companion object. Contains functions for creating and wo
 
   // def length[A](l: List[A]): Int = foldRight(l, 0)((_, accumulator) => accumulator + 1)
 
+  def foldRight[A,B](as: List[A], z: B)(f: (A, B) => B): B = // Utility functions
+    as match {
+      case Nil => z
+      case Cons(x, xs) => f(x, foldRight(xs, z)(f))
+    }
+
+
   @annotation.tailrec
   def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = l match {
     case Nil => z
     case Cons(h, t) => foldLeft(t, f(z, h))(f)
   }
+
+//  def foldLeftViaFoldRight[A,B](l: List[A], z: B)(f: (B, A) => B): B = {
+//    // val reversedList = foldLeft(l, Nil: List[A])((z: List[A], h: A) => Cons(h, z))
+//    val reversedList = foldRight(l, Nil: List[A])((h: A, z: List[A]) => Cons(h, z))
+//    foldRight()
+//
+//
+//  }
+
+  def foldRightViaFoldLeft_1[A,B](l: List[A], z: B)(f: (A,B) => B): B = {
+//    val func: B => B = b => b
+    foldLeft(l, (b: B) => b) ( (g, a) => (b => g(f(a, b))) ) (z)
+  }
+
+  def foldRightViaFoldLeft[A,B](as: List[A], z: B)(f: (A, B) => B): B = foldLeft(reverse(as), z)((b: B, a: A) => f(a, b))
 
   def sum(ints: List[Int]): Int = foldLeft(ints, 0)(_ + _)
 
@@ -92,6 +108,7 @@ object List { // `List` companion object. Contains functions for creating and wo
   def length[A](l: List[A]): Int = foldLeft(l, 0)((accumulator, _) => accumulator + 1)
 
   def reverse[A](l: List[A]): List[A] = foldLeft(l, Nil: List[A])((z: List[A], h: A) => Cons(h, z))
+  // def reverse[A](l: List[A]): List[A] = foldRight(l, Nil: List[A])((z: List[A], h: A) => Cons(h, z))
 
   def map[A,B](l: List[A])(f: A => B): List[B] = ???
 }
