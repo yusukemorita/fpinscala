@@ -38,6 +38,9 @@ object List { // `List` companion object. Contains functions for creating and wo
       case Cons(h,t) => Cons(h, append(t, a2))
     }
 
+  def append2[A](l: List[A], z: List[A]): List[A] =
+    foldRight(l: List[A], z: List[A])((newHead: A, resultList: List[A]) => Cons(newHead, resultList))
+
   def sum2(ns: List[Int]) =
     foldRight(ns, 0)((x,y) => x + y)
 
@@ -86,14 +89,6 @@ object List { // `List` companion object. Contains functions for creating and wo
     case Cons(h, t) => foldLeft(t, f(z, h))(f)
   }
 
-//  def foldLeftViaFoldRight[A,B](l: List[A], z: B)(f: (B, A) => B): B = {
-//    // val reversedList = foldLeft(l, Nil: List[A])((z: List[A], h: A) => Cons(h, z))
-//    val reversedList = foldRight(l, Nil: List[A])((h: A, z: List[A]) => Cons(h, z))
-//    foldRight()
-//
-//
-//  }
-
   def foldRightViaFoldLeft_1[A,B](l: List[A], z: B)(f: (A,B) => B): B = {
 //    val func: B => B = b => b
     foldLeft(l, (b: B) => b) ( (g, a) => (b => g(f(a, b))) ) (z)
@@ -111,4 +106,13 @@ object List { // `List` companion object. Contains functions for creating and wo
   // def reverse[A](l: List[A]): List[A] = foldRight(l, Nil: List[A])((z: List[A], h: A) => Cons(h, z))
 
   def map[A,B](l: List[A])(f: A => B): List[B] = ???
+
+  @annotation.tailrec
+  def flatten1[A](l: List[List[A]]): List[A] = l match {
+    case Nil => Nil
+    case Cons(list, Nil) => list
+    case Cons(list1, Cons(list2, remainingLists)) => flatten1(setHead(remainingLists, append(list1, list2)))
+  }
+
+  def flatten[A](l: List[List[A]]): List[A] = foldLeft(l, Nil: List[A])(append)
 }
