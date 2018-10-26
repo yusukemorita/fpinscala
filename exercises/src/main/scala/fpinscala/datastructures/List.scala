@@ -121,4 +121,8 @@ object List { // `List` companion object. Contains functions for creating and wo
   def addOneToEachElement(l: List[Int]): List[Int] = {
     foldRight(l, Nil:List[Int])((head, tail) => Cons(head + 1, tail))
   }
+
+  def doublesInListToString(l: List[Double]): List[String] = {
+    foldRight(l, Nil: List[String])((head, tail) => Cons(head.toString, tail))
+  }
 }
