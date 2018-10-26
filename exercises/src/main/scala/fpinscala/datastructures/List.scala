@@ -108,11 +108,17 @@ object List { // `List` companion object. Contains functions for creating and wo
   def map[A,B](l: List[A])(f: A => B): List[B] = ???
 
   @annotation.tailrec
-  def flatten1[A](l: List[List[A]]): List[A] = l match {
-    case Nil => Nil
-    case Cons(list, Nil) => list
-    case Cons(list1, Cons(list2, remainingLists)) => flatten1(setHead(remainingLists, append(list1, list2)))
+  def flatten1[A](l: List[List[A]]): List[A] = {
+    l match {
+      case Nil => Nil
+      case Cons(list, Nil) => list
+      case Cons(list1, Cons(list2, remainingLists)) => flatten1(setHead(remainingLists, append(list1, list2)))
+    }
   }
 
   def flatten[A](l: List[List[A]]): List[A] = foldLeft(l, Nil: List[A])(append)
+
+  def addOneToEachElement(l: List[Int]): List[Int] = {
+    foldRight(l, Nil:List[Int])((head, tail) => Cons(head + 1, tail))
+  }
 }
