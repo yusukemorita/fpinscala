@@ -12,7 +12,7 @@ class Exercise3_14Spec extends FlatSpec {
     assert(List.append2(List(1, 2), Nil) === List(1, 2))
   }
 
-  "append2(List(1, 2), Nil)" should "return List(1, 2)" in {
-    assert(List.append2(List(1, 2), Nil) === List(1, 2))
+  "append2(Nil, List(1, 2, 3, 4))" should "return List(1, 2, 3, 4)" in {
+    assert(List.append2(Nil, List(1, 2, 3, 4)) === List(1, 2, 3, 4))
   }
 }
