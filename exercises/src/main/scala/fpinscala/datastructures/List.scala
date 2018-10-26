@@ -105,7 +105,9 @@ object List { // `List` companion object. Contains functions for creating and wo
   def reverse[A](l: List[A]): List[A] = foldLeft(l, Nil: List[A])((z: List[A], h: A) => Cons(h, z))
   // def reverse[A](l: List[A]): List[A] = foldRight(l, Nil: List[A])((z: List[A], h: A) => Cons(h, z))
 
-  def map[A,B](l: List[A])(f: A => B): List[B] = ???
+  def map[A,B](l: List[A])(f: A => B): List[B] = {
+    foldRight(l, Nil: List[B])((head, tail) => Cons(f(head), tail))
+  }
 
   @annotation.tailrec
   def flatten1[A](l: List[List[A]]): List[A] = {
