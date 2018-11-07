@@ -139,4 +139,19 @@ object List { // `List` companion object. Contains functions for creating and wo
   def filterWithFlatMap[A](as: List[A])(f: A => Boolean): List[A] = {
     flatMap(as)(i => if (f(i)) List(i) else Nil)
   }
+
+  def addElements(l1: List[Int], l2: List[Int]): List[Int] = {
+    (l1, l2) match {
+      // もし、要素数が違う場合に多い方の要素は残したい場合は以下のような実装になる
+//      case (Nil, Nil) => Nil
+//      case (Nil, Cons(h2, t2)) => Cons(h2, t2)
+//      case (Cons(h1, t1), Nil) => Cons(h1, t1)
+//      case (Cons(h1, t1), Cons(h2, t2)) => Cons(h1 + h2, addElements(t1, t2))
+      case (Nil, _) => Nil
+      case (_, Nil) => Nil
+      case (Cons(h1,t1), Cons(h2,t2)) => Cons(h1+h2, addElements(t1,t2))
+    }
+  }
+
+
 }
