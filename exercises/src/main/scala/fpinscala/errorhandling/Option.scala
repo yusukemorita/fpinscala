@@ -49,7 +49,10 @@ object Option {
     mean(xs.map(x => math.pow(x - m, 2)))
   }
 
-  def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = ???
+  def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = (a, b) match {
+    case (_, None) | (None, _) => None
+    case (Some(x), Some(y)) => Some(f(x, y))
+  }
 
   def sequence[A](a: List[Option[A]]): Option[List[A]] = ???
 
