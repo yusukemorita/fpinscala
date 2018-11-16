@@ -54,7 +54,12 @@ object Option {
     case (Some(x), Some(y)) => Some(f(x, y))
   }
 
-  def sequence[A](a: List[Option[A]]): Option[List[A]] = ???
+  def sequence[A](a: List[Option[A]]): Option[List[A]] = a match {
+    case head :: tail => head.flatMap{h => sequence(tail).map(t => h :: t)}
+    case Nil => Some(Nil)
+  }
+
+  def sequence2[A](a: List[Option[A]]): Option[List[A]] = a.foldRight[Option[List[A]]](Some(Nil))( (x, y) => map2(x, y)(_ :: _))
 
   def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = ???
 }
