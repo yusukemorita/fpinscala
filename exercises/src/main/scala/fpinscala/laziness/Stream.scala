@@ -2,6 +2,33 @@ package fpinscala.laziness
 
 import Stream._
 trait Stream[+A] {
+  def toList: List[A] = {
+    @annotation.tailrec
+    def go(list: List[A], s: Stream[A]): List[A] = s match {
+      case Cons(h, t) => go(h() :: list, t())
+      case Empty => list
+    }
+
+    go(Nil, this).reverse
+  }
+
+  // since the listBuffer never escapes the toListWithBuffer method,
+  // the function remains pure.
+  // ie, buf has no effect on the outside of the toListWithBuffer function.
+  def toListWithListBuffer: List[A] = {
+    val buf = new collection.mutable.ListBuffer[A]
+
+    @annotation.tailrec
+    def go(s: Stream[A]): List[A] = s match {
+      case Cons(h, t) =>
+        buf += h()
+        go(t())
+      case Empty => buf.toList
+    }
+
+    go(this)
+  }
+
 
   def foldRight[B](z: => B)(f: (A, => B) => B): B = // The arrow `=>` in front of the argument type `B` means that the function `f` takes its second argument by name and may choose not to evaluate it.
     this match {
