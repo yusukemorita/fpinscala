@@ -83,6 +83,13 @@ class Exercise5_13Spec extends FlatSpec {
     assert(stream.zipWith(stream)((a: Int, b: Int) => a * b).toList === List(1, 4, 9))
   }
 
+  "zipWith(Stream(1, 2, 3), Stream(2, 3)(_ * _)" should "return Stream(2, 6)" in {
+    val stream1 = Stream.cons(3, Empty)
+    val stream2 = Stream.cons(2, stream1)
+    val stream = Stream.cons(1, stream2)
+    assert(stream.zipWith(stream2)((a: Int, b: Int) => a * b).toList === List(2, 6))
+  }
+
   "zipWith(stream.zipWith(List(1, 2, 3), List(a, b, c)" should "return List(1a, 2b, 3c)" in {
     val stream1 = Stream.cons(3, Empty)
     val stream2 = Stream.cons(2, stream1)

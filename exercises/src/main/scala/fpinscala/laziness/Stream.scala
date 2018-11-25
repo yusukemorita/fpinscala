@@ -106,7 +106,7 @@ trait Stream[+A] {
     case (s1, s2) => Some((s1.headOption, s2.headOption), (s1.drop(1), s2.drop(1)))
   }
 
-  def startsWith[B](s: Stream[B]): Boolean = ???
+  def startsWith1[B](s: Stream[B]): Boolean = zipWith(s)((a, b) => a == b).forAll(_ == true)
 }
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
