@@ -80,6 +80,32 @@ trait Stream[+A] {
   def flatMap[B](f: A => Stream[B]): Stream[B] =
     foldRight(Empty: Stream[B])((a, acc) => f(a) append acc)
 
+  def mapByUnfold[B](f: A => B): Stream[B] = unfold(this) {
+    case Cons(h, t) => Some((f(h()), t()))
+    case _ => None
+  }
+
+  def takeViaUnfold(n: Int): Stream[A] = unfold((n, this)) {
+    case (nn, Cons(_, _)) if nn <= 0 => None
+    case (nn, Cons(h, t)) => Some((h(), (nn - 1, t())))
+    case _ => None
+  }
+
+  def takeWhileViaUnfold(p: A => Boolean): Stream[A] = unfold(this) {
+    case Cons(h, t) if p(h()) => Some((h(), t()))
+    case _ => None
+  }
+
+  def zipWith[B, C](s: Stream[B])(f: (A, B) => C): Stream[C]= unfold((this, s)) {
+    case (Cons(h1, t1), Cons(h2, t2)) => Some(f(h1(), h2()), (t1(), t2()))
+    case _ => None
+  }
+
+  def zipAll[B](s: Stream[B]): Stream[(Option[A],Option[B])] = unfold((this, s)) {
+    case (Empty, Empty) => None
+    case (s1, s2) => Some((s1.headOption, s2.headOption), (s1.drop(1), s2.drop(1)))
+  }
+
   def startsWith[B](s: Stream[B]): Boolean = ???
 }
 case object Empty extends Stream[Nothing]
@@ -124,4 +150,5 @@ object Stream {
   def constantByUnfold[A](a: A): Stream[A] = unfold(a)(_ => Some(a, a))
 
   val onesByUnfold: Stream[Int] = constantByUnfold(1)
+
 }
