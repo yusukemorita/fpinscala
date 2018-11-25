@@ -116,4 +116,12 @@ object Stream {
     case Some((a, s)) => cons(a, unfold(s)(f))
     case None => empty
   }
+
+  def fibsByUnfold: Stream[Int] = unfold((0, 1)){ case (a: Int, b: Int) => Some(a, (b, a + b))}
+
+  def fromByUnfold(i: Int): Stream[Int] = unfold(i)((a: Int) => Some((a, a + 1)))
+
+  def constantByUnfold[A](a: A): Stream[A] = unfold(a)(_ => Some(a, a))
+
+  val onesByUnfold: Stream[Int] = constantByUnfold(1)
 }
