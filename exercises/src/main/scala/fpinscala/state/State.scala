@@ -30,6 +30,8 @@ object RNG {
       (f(a), rng2)
     }
 
+  def doubleViaMap: Rand[Double] = map(nonNegativeInt)(i => i / (Int.MaxValue + 1))
+
   def nonNegativeInt1(rng: RNG): (Int, RNG) = rng.nextInt match {
     case (n, nextRng) if n >= 0 => (n, nextRng)
     case (_, nextRng) => nonNegativeInt1(nextRng)
