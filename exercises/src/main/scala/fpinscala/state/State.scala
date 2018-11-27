@@ -30,6 +30,8 @@ object RNG {
       (f(a), rng2)
     }
 
+  def mapViaFlatMap[A,B](s: Rand[A])(f: A => B): Rand[B] = flatMap(s)(a => unit(f(a)))
+
   def doubleViaMap: Rand[Double] = map(nonNegativeInt)(i => i / (Int.MaxValue + 1))
 
   def nonNegativeInt1(rng: RNG): (Int, RNG) = rng.nextInt match {
@@ -83,6 +85,9 @@ object RNG {
       val (b, rng2) = rb(rng1)
       (f(a, b), rng2)
     }
+
+  def map2ViaFlatMap[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+    flatMap(ra)(a => map(rb)(b => f(a, b)))
 
   def sequence1[A](fs: List[Rand[A]]): Rand[List[A]] = {
     def go(functionList: List[Rand[A]], resultList: List[A], r: RNG): (List[A], RNG) = functionList match {
