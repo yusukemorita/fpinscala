@@ -84,7 +84,22 @@ object RNG {
       (f(a, b), rng2)
     }
 
-  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = ???
+  def sequence1[A](fs: List[Rand[A]]): Rand[List[A]] = {
+    def go(functionList: List[Rand[A]], resultList: List[A], r: RNG): (List[A], RNG) = functionList match {
+      case h :: t =>
+        val (a, nextRng) = h(r)
+        go(t, a :: resultList, nextRng)
+      case Nil => (resultList, r)
+    }
+
+    rng => go(fs, Nil, rng)
+  }
+
+  def sequence2[A](fs: List[Rand[A]]): Rand[List[A]] = rng => fs.foldRight((Nil: List[A], rng))((rand, acc) => rand(acc._2) match {
+    case (a, nextRng) => (a :: acc._1, nextRng)
+  })
+
+  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = fs.foldRight(unit(List[A]()))((randA, randListA) => map2(randA, randListA)(_ :: _))
 
   def flatMap[A,B](f: Rand[A])(g: A => Rand[B]): Rand[B] = ???
 }
