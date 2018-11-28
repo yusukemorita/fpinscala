@@ -122,12 +122,20 @@ object RNG {
 }
 
 case class State[S,+A](run: S => (A, S)) {
-  def map[B](f: A => B): State[S, B] =
-    ???
-  def map2[B,C](sb: State[S, B])(f: (A, B) => C): State[S, C] =
-    ???
-  def flatMap[B](f: A => State[S, B]): State[S, B] =
-    ???
+
+  def map1[B](f: A => B): State[S, B] = State(state => {
+    val (a, rng2) = this.run(state)
+    (f(a), rng2)
+  })
+
+  def map[B](f: A => B): State[S, B] = flatMap(a => State.unit(f(a)))
+
+  def map2[B,C](sb: State[S, B])(f: (A, B) => C): State[S, C] = flatMap(a => sb.map(b => f(a, b)))
+
+  def flatMap[B](f: A => State[S, B]): State[S, B] = State(state => {
+    val (a, rng1) = run(state)
+    f(a).run(rng1)
+  })
 }
 
 sealed trait Input
@@ -139,4 +147,9 @@ case class Machine(locked: Boolean, candies: Int, coins: Int)
 object State {
   type Rand[A] = State[RNG, A]
   def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = ???
+
+  def unit[A, S](a: A): State[S, A] = State(state => (a, state))
+
+  def sequence[A, S](fs: List[State[S, A]]): State[S, List[A]] =
+    fs.foldRight(unit[List[A], S](List()))((stateA, stateOfListA) => stateA.map2(stateOfListA)((a, b) => a::b))
 }
