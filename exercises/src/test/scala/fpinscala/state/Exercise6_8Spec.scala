@@ -7,7 +7,7 @@ class Exercise6_8Spec extends FlatSpec {
 
   // flatMap
 
-  "flatMap" should "two integers" in {
+  "flatMap" should "work" in {
     val randInt: Rand[Int] = RNG.int
     val randDouble = RNG.flatMap(randInt)(_ => RNG.doubleViaMap)
 
