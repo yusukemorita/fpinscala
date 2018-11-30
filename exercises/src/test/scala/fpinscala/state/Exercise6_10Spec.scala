@@ -51,15 +51,21 @@ class Exercise6_10Spec extends FlatSpec {
 
   "map2" should "work" in {
     val randInt: Rand[Int] = RNG.int
-    val stateInt = new State(randInt)
-    val stateDouble= new State(randInt)
-    val func: State[Rand[Int], String] = stateInt.map2(stateInt)((a, b) => a.toString + b.toString)
-    val rng = RNG.Simple(12345)
-    val ((a1, b1), nextRng1) = func(rng)
-    val ((a2, b2), nextRng2) = func(rng)
+    val randDouble = RNG.flatMap(randInt)(_ => RNG.doubleViaMap)
 
-    assert(a1 == a2)
-    assert(b1 == b2)
-    assert(nextRng1 === nextRng2)
+    val state1: State[RNG, Int] = new State(randInt)
+    val state2: State[RNG, Double] = new State(randDouble)
+
+    val func = state1.map2(state2)((a: Int, b: Double) => a.toString + b.toString)
+
+    val rng: RNG = RNG.Simple(12345)
+
+    val (expectedInt, nextRng) = state1.run(rng)
+    val (expectedDouble, _) = state2.run(nextRng)
+    val expectedString = expectedInt.toString + expectedDouble.toString
+
+    val (resultString, _) = func.run(rng)
+
+    assert(expectedString === resultString)
   }
 }
