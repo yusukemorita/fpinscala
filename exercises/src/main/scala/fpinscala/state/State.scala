@@ -142,11 +142,29 @@ sealed trait Input
 case object Coin extends Input
 case object Turn extends Input
 
-case class Machine(locked: Boolean, candies: Int, coins: Int)
+case class Machine(locked: Boolean, candies: Int, coins: Int) {
+
+  def receiveCoin(coin: Input): Machine = {
+    if (candies > 0 && locked) {
+      copy(locked = false)
+    } else {
+      this
+    }
+  }
+
+}
 
 object State {
   type Rand[A] = State[RNG, A]
-  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = ???
+
+  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = State { machine =>
+    inputs match {
+      case Nil => ((machine.candies, machine.coins), machine)
+      case h :: t =>
+        val nextMachine = machine.receiveCoin(h)
+        ((nextMachine.candies, nextMachine.coins), nextMachine)
+    }
+  }
 
   def unit[A, S](a: A): State[S, A] = State(state => (a, state))
 
