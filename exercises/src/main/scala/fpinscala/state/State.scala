@@ -144,9 +144,22 @@ case object Turn extends Input
 
 case class Machine(locked: Boolean, candies: Int, coins: Int) {
 
-  def receiveCoin(coin: Input): Machine = {
+  def receiveInput(i: Input): Machine = i match {
+    case Coin => receiveCoin
+    case Turn => turnKnob
+  }
+
+  def receiveCoin: Machine = {
     if (candies > 0 && locked) {
       copy(locked = false)
+    } else {
+      this
+    }
+  }
+
+  def turnKnob: Machine = {
+    if (candies > 0 && !locked) {
+      copy(locked = true, candies = candies - 1)
     } else {
       this
     }
@@ -157,15 +170,21 @@ case class Machine(locked: Boolean, candies: Int, coins: Int) {
 object State {
   type Rand[A] = State[RNG, A]
 
-  def unit[A, S](a: A): State[S, A] = State(state => (a, state))
+  def simulateMachine1(inputs: List[Input]): State[Machine, (Int, Int)] = {
+    def go(machine: Machine, inputList: List[Input]): Machine = inputList match {
+      case Nil => machine
+      case h :: t => go(machine.receiveInput(h), t)
+    }
+
+    State { machine =>
+      val nextMachine = go(machine, inputs)
+      ((nextMachine.candies, nextMachine.coins), nextMachine)
+    }
+  }
 
   def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = State { machine =>
-    inputs match {
-      case Nil => ((machine.candies, machine.coins), machine)
-      case h :: t =>
-        val nextMachine = machine.receiveCoin(h)
-        ((nextMachine.candies, nextMachine.coins), nextMachine)
-    }
+    val x = inputs.foldLeft(machine)((m, input) => m.receiveInput(input))
+    ((x.candies, x.coins), x)
   }
 
   def unit[A, S](a: A): State[S, A] = State(state => (a, state))
