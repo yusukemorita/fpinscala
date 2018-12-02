@@ -4,6 +4,7 @@ import java.util.concurrent._
 import language.implicitConversions
 
 object Par {
+
   type Par[A] = ExecutorService => Future[A]
   
   def run[A](s: ExecutorService)(a: Par[A]): Future[A] = a(s)
@@ -95,6 +96,14 @@ object Par {
     es => 
       if (run(es)(cond).get) t(es) // Notice we are blocking on the result of `cond`.
       else f(es)
+
+  def choiceN[A](n: Par[Int])(choices: List[Par[A]]): Par[A] = es => {
+    val nn = run(es)(n).get
+    choices(nn)(es)
+  }
+
+  def choiceViaChoiceN[A](cond: Par[Boolean])(t: Par[A], f: Par[A]): Par[A] =
+    choiceN(map(cond)(if (_) 0 else 1))(List(t, f))
 
   /* Gives us infix syntax for `Par`. */
   implicit def toParOps[A](p: Par[A]): ParOps[A] = new ParOps(p)
