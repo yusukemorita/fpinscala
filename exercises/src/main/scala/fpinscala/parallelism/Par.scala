@@ -116,3 +116,18 @@ object Examples {
     }
 
 }
+
+/**
+  Exercise 7.7
+
+  map(y)(g) == map(unit(x))(g)
+            == unit(g(x))
+
+  map(map(y)(g))(f) == map(unit(g(x)))(f)
+                    == unit(f(g(x)))
+                    == map(unit(x))(f compose g)
+                    == map(y)(f compose g)
+
+  therefore map(map(y)(g))(f) == map(y)(f compose g)
+
+  **/
