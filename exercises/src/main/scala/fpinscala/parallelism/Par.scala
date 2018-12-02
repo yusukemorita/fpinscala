@@ -74,9 +74,18 @@ object Par {
   def map[A,B](pa: Par[A])(f: A => B): Par[B] = 
     map2(pa, unit(()))((a,_) => f(a))
 
+  def parMap[A,B](ps: List[A])(f: A => B): Par[List[B]] = fork { val fbs: List[Par[B]] = ps.map(asyncF(f))
+    sequence(fbs)
+  }
+
+  def parFilter[A](as: List[A])(f: A => Boolean): Par[List[A]] = {
+    val x = parMap(as)(a => if (f(a)) List(a) else List())
+    map(x)(_.flatten)
+  }
+
   def sortPar(parList: Par[List[Int]]) = map(parList)(_.sorted)
 
-  def equal[A](e: ExecutorService)(p: Par[A], p2: Par[A]): Boolean = 
+  def equal[A](e: ExecutorService)(p: Par[A], p2: Par[A]): Boolean =
     p(e).get == p2(e).get
 
   def delay[A](fa: => Par[A]): Par[A] = 
