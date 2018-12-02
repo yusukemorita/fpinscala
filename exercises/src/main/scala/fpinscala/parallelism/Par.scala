@@ -109,11 +109,19 @@ object Par {
   def choiceMap[K,V](key: Par[K])(choices: Map[K,Par[V]]): Par[V] =
     chooser(key)(choices(_))
 
-  def chooser[A, B](n: Par[B])(parallel: B => Par[A]): Par[A] = es => {
+  // same as flatMap
+  def chooser[A, B](n: Par[B])(f: B => Par[A]): Par[A] = es => {
     val nn = run(es)(n).get
-    val par = parallel(nn)
+    val par = f(nn)
     par(es)
   }
+
+  def flatMap[A, B](n: Par[B])(f: B => Par[A]): Par[A] = join(map(n)(f))
+
+  def join[A](a: Par[Par[A]]): Par[A] = es => run(es)(run(es)(a).get())
+
+  // uses chooser instead of join to avoid infinite loop
+  def joinByFlatMap[A](a: Par[Par[A]]): Par[A] = chooser(a)(x => x)
 
   /* Gives us infix syntax for `Par`. */
   implicit def toParOps[A](p: Par[A]): ParOps[A] = new ParOps(p)
