@@ -28,10 +28,18 @@ object Prop {
 }
 
 case class Gen[A](sample: State[RNG,A]){
-
   def map[B](f: A => B): Gen[B] = {
     Gen(sample.map(f))
   }
+
+  def flatMap2[B](f: A => Gen[B]): Gen[B] = Gen(State{ rng =>
+    val (i, nextRng) = sample.run(rng)
+    f(i).sample.run(nextRng)
+  })
+
+  def flatMap[B](f: A => Gen[B]): Gen[B] = Gen(sample.flatMap(a => f(a).sample))
+
+  def listOfN(size: Gen[Int]): Gen[List[A]] = size.flatMap(i => Gen.listOfN(i, this))
 }
 
 object Gen {
