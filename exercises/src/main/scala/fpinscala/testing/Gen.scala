@@ -27,7 +27,12 @@ object Prop {
   def forAll[A](gen: Gen[A])(f: A => Boolean): Prop = ???
 }
 
-case class Gen[A](sample: State[RNG,A])
+case class Gen[A](sample: State[RNG,A]){
+
+  def map[B](f: A => B): Gen[B] = {
+    Gen(sample.map(f))
+  }
+}
 
 object Gen {
   def unit[A](a: => A): Gen[A] = Gen(State.unit(a): State[RNG, A])
@@ -64,7 +69,7 @@ object Gen {
   // 5, 6, 7, 8, 9
   // 0, 1, 2, 3, 4
 
-  def choose(start: Int, stopExclusive: Int): Gen[Int] = {
+  def chooseV2(start: Int, stopExclusive: Int): Gen[Int] = {
     val a: Rand[Int] = rng =>{
       val (i, nextRng) = RNG.nonNegativeLessThan(stopExclusive - start)(rng)
       (i + start, nextRng)
@@ -72,8 +77,23 @@ object Gen {
     Gen(State(a))
   }
 
-  def choose2(start: Int, stopExclusive: Int): Gen[Int] = {
+  def chooseTuple(start: Int, stopExclusive: Int): Gen[(Int, Int)] = {
+    listOfN(2, choose(start, stopExclusive)).map(i => (i.head, i(1)))
+  }
+
+  def choose(start: Int, stopExclusive: Int): Gen[Int] = {
     Gen(State(RNG.nonNegativeLessThan(stopExclusive - start - 1)).map(i => i + start))
+  }
+
+  def optionGen[A](gen: Gen[A]): Gen[Option[A]] = {
+    gen.map(Some(_))
+  }
+
+  def unOptionGen[A](gen: Gen[Option[A]]): Gen[A] = {
+    gen.map {
+      case Some(a) => a
+      case None => ???
+    }
   }
 }
 
