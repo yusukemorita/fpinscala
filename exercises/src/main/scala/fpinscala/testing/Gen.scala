@@ -43,7 +43,6 @@ object Gen {
   def boolean2: Gen[Boolean] = Gen(State(RNG.boolean))
 
 
-
   def listOfN[A](n: Int, g: Gen[A]): Gen[List[A]] = {
     def go(nn: Int, r: RNG, l: List[A]): (List[A], RNG) = {
       nn match {
@@ -63,7 +62,7 @@ object Gen {
 
   // 5, 10
   // 5, 6, 7, 8, 9
-  // 0, 1, 2, 3, 4, 5
+  // 0, 1, 2, 3, 4
 
   def choose(start: Int, stopExclusive: Int): Gen[Int] = {
     val a: Rand[Int] = rng =>{
@@ -71,6 +70,10 @@ object Gen {
       (i + start, nextRng)
     }
     Gen(State(a))
+  }
+
+  def choose2(start: Int, stopExclusive: Int): Gen[Int] = {
+    Gen(State(RNG.nonNegativeLessThan(stopExclusive - start - 1)).map(i => i + start))
   }
 }
 
