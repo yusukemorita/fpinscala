@@ -27,19 +27,44 @@ object Prop {
   def forAll[A](gen: Gen[A])(f: A => Boolean): Prop = ???
 }
 
-case class Gen[A](sample: State[RNG,A]) {
-
-
-
-
-}
+case class Gen[A](sample: State[RNG,A])
 
 object Gen {
-  def unit[A](a: => A): Gen[A] = ???
+  def unit[A](a: => A): Gen[A] = Gen(State.unit(a): State[RNG, A])
+
+  def boolean: Gen[Boolean] = {
+    val a: Rand[Boolean] = rng => {
+      val (i, nextRng) = RNG.nonNegativeInt(rng)
+      (i % 2 == 0, nextRng)
+    }
+    Gen(State(a))
+  }
+
+  def boolean2: Gen[Boolean] = Gen(State(RNG.boolean))
+
+
+
+  def listOfN[A](n: Int, g: Gen[A]): Gen[List[A]] = {
+    def go(nn: Int, r: RNG, l: List[A]): (List[A], RNG) = {
+      nn match {
+        case i if i <= 0 => (l, r)
+        case i =>
+          val (h, nextRng) = g.sample.run(r)
+          go(i - 1, nextRng, h :: l)
+      }
+    }
+
+    Gen(
+      State(rng => go(n, rng, List[A]()))
+    )
+  }
+
+  def listOfN[A](n: Int, g: Gen[A]): Gen[List[A]] = Gen(State.sequence(List.fill(n)(g.sample)))
 
   // 5, 10
   // 5, 6, 7, 8, 9
   // 0, 1, 2, 3, 4, 5
+
   def choose(start: Int, stopExclusive: Int): Gen[Int] = {
     val a: Rand[Int] = rng =>{
       val (i, nextRng) = RNG.nonNegativeLessThan(stopExclusive - start)(rng)

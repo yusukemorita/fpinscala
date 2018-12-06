@@ -30,6 +30,9 @@ object RNG {
       (f(a), rng2)
     }
 
+  def boolean(rng: RNG): (Boolean, RNG) =
+    rng.nextInt match { case (i,rng2) => (i%2==0,rng2) }
+
   def mapViaFlatMap[A,B](s: Rand[A])(f: A => B): Rand[B] = flatMap(s)(a => unit(f(a)))
 
   def doubleViaMap: Rand[Double] = map(nonNegativeInt)(i => i / (Int.MaxValue + 1))
