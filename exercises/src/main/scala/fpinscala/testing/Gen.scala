@@ -93,6 +93,8 @@ object Gen {
     Gen(State(RNG.nonNegativeLessThan(stopExclusive - start - 1)).map(i => i + start))
   }
 
+  def union[A](g1: Gen[A], g2: Gen[A]): Gen[A] = Gen.boolean.flatMap(b => if (b) g1 else g2)
+
   def optionGen[A](gen: Gen[A]): Gen[Option[A]] = {
     gen.map(Some(_))
   }
