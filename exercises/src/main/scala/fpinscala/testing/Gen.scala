@@ -154,6 +154,7 @@ object Gen {
     }
   }
 
+  def listOf[A](g: Gen[A]): SGen[List[A]] = SGen(listOfN(_, g))
 }
 
 case class SGen[+A](g: Int => Gen[A]) {
@@ -162,5 +163,4 @@ case class SGen[+A](g: Int => Gen[A]) {
   def flatMap[B](f: A => SGen[B]): SGen[B] = SGen { int =>
     g(int).flatMap(f(_).g(int))
   }
-
 }
