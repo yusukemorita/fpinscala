@@ -156,9 +156,11 @@ object Gen {
 
 }
 
-//trait Gen[A] {
-//  def map[A,B](f: A => B): Gen[B] = ???
-//  def flatMap[A,B](f: A => Gen[B]): Gen[B] = ???
-//}
+case class SGen[+A](g: Int => Gen[A]) {
+  def map[B](f: A => B): SGen[B] = SGen(g(_).map(f))
 
-case class SGen[+A](forSize: Int => Gen[A])
+  def flatMap[B](f: A => SGen[B]): SGen[B] = SGen { int =>
+    g(int).flatMap(f(_).g(int))
+  }
+
+}
