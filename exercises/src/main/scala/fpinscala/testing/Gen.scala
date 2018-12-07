@@ -95,6 +95,17 @@ object Gen {
 
   def union[A](g1: Gen[A], g2: Gen[A]): Gen[A] = Gen.boolean.flatMap(b => if (b) g1 else g2)
 
+  def double: Gen[Double] = Gen(State(RNG.double))
+
+  def weightedBoolean(d1: Double, d2: Double): Gen[Boolean] = {
+    val probability = d1 / ( d1 + d1 )
+    Gen(State(RNG.double)).map(d => if (d < probability) true else false)
+  }
+
+  def weighted[A](g1: (Gen[A],Double), g2: (Gen[A],Double)): Gen[A] = {
+    weightedBoolean(g1._2, g2._2).flatMap(b => if (b) g1._1 else g2._1)
+  }
+
   def optionGen[A](gen: Gen[A]): Gen[Option[A]] = {
     gen.map(Some(_))
   }
