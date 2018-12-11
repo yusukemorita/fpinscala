@@ -3,6 +3,9 @@ package fpinscala.testing
 import fpinscala.laziness.Stream
 import fpinscala.state._
 import Prop._
+import fpinscala.parallelism.Par
+import fpinscala.parallelism.Par.Par
+
 import language.postfixOps
 import language.implicitConversions
 
@@ -190,3 +193,14 @@ object exercise_8_14 {
   })
 }
 
+object exercise_8_16 {
+  val pint2: Gen[Par[Int]] =
+    Gen
+      .choose(-100,100)
+      .listOfN(Gen.choose(0,20))
+      .map(l =>
+        l.foldLeft(Par.unit(0))((p,i) =>
+          Par.fork { Par.map2(p, Par.unit(i))(_ + _) }
+        )
+      )
+}
